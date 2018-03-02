@@ -1,0 +1,20 @@
+{
+   "wifi_credentials":[
+      {
+         "WIFI_SSID":"wifi ssid 1",
+         "WIFI_PASS":"wifipass1"
+      },
+      {
+         "WIFI_SSID":"wifi ssid 2",
+         "WIFI_PASS":"wifipass2"
+      },
+      {
+         "WIFI_SSID":"wifi ssid 3",
+         "WIFI_PASS":"wifipass3"
+      }
+   ],
+   "mqtt_server":"my.mqtt.net",
+   "mqtt_port":11883,
+   "mqtt_user":"mqttusername",
+   "mqtt_pass":"mqttpassword"
+}
