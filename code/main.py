@@ -4,7 +4,7 @@ import machine
 from mqtt import MQTTClient
 from machine import Pin
 import ujson
-import settings
+
 
 
 # Many ESP8266 boards have active-low "flash" button on GPIO0.
@@ -12,12 +12,11 @@ button = Pin(0, Pin.IN)
 
 
 # Default MQTT server to connect to
-WIFI_SSID = 'my ssid'
-WIFI_PASS = 'my wifi password'
-SERVER = "my.mqtt.net"
-PORT = 11883
-USERNAME = "mqttusername"
-PASSWORD = "mqttpassword"
+
+SERVER = cfg['mqtt_server']
+PORT = cfg['mqtt_port']
+USERNAME = cfg['mqtt_user']
+PASSWORD = cfg['mqtt_pass']
 CLIENT_ID = ubinascii.hexlify(machine.unique_id())
 PUB_TOPIC =  b"touch_cube/status"
 COLOUR_TOPIC = b"touch_cube/colour"
@@ -39,27 +38,10 @@ def sub_cb(topic, msg):
         np[0] = (colour)
         np.write()
 
-def http_get(url):
-    _, _, host, path = url.split('/', 3)
-    addr = socket.getaddrinfo(host, 443)[0][-1]
-    s = socket.socket()
-    s.connect(addr)
-    s.send(bytes('GET /%s HTTP/1.0\r\nHost: %s\r\n\r\n' % (path, host), 'utf8'))
-    while True:
-        data = s.recv(100)
-        if data:
-            return (str(data, 'utf8'), end='')
-        else:
-            break
-    s.close()
-
-
-    addr_info = socket.getaddrinfo("iamshaw.net", 23)
-
-
 
 def main():
     global colour
+    global connected_wifi
     c = MQTTClient(CLIENT_ID, SERVER, user=USERNAME, password=PASSWORD, port=PORT)
     c.set_callback(sub_cb)
     c.connect()
@@ -67,9 +49,8 @@ def main():
     np.write()
     c.subscribe(COLOUR_TOPIC)
     c.subscribe(TEST_TOPIC)
-    c.publish(PUB_TOPIC,  "Online and waiting for a colour code!")
-    test = http_get('https://iamshaw.net/test.json')
-    c.publish(PUB_TOPIC,  test)
+    c.publish(PUB_TOPIC,  "I have connected to "+connected_wifi+" and waiting for a colour code!")
+
 
     while True:
 
@@ -170,5 +151,5 @@ def rainbow():
 
 
 if __name__ == "__main__":
-    wifi_connect(WIFI_SSID,WIFI_PASS)
+    wifi_connect()
     main()
